@@ -7,15 +7,10 @@ x_dim = 1
 mx_dim = 2
 min_x = -10
 max_x = 10
-length = 40
-weights = [random.random()*4-2 for i in range(mx_dim)]
+length = 5
+weights = [random.random()*4-2 for i in range(mx_dim+1)]
 
 def f(x):
-    # if type(x) == list:
-    #     if len(x) == 1:
-    #         x = x[0]
-    #     else:
-    #         return sum([6*(random.random()-0.5)*i for i in x])
     out = 0
     for i in range(len(weights)):
         out += x**i * weights[i]
@@ -37,13 +32,13 @@ print "-------------MX:  ", mx
 print "-------------Y:  ", y
 
 model = linear_model.LinearRegression()
-model.fit(x, y)
+model.fit(mx, y) #not in right format
 print "-------------Model Trained"
 
-error = numpy.sqrt(numpy.average(numpy.square(numpy.subtract(y, model.predict(x)))))
-predicted = model.predict(x)
-print "-------------Moderl Prediction:", predicted
-print "-------------Error:", error
+# error = numpy.sqrt(numpy.average(numpy.square(numpy.subtract(y, model.predict(x)))))
+# predicted = model.predict(x)
+# print "-------------Model Prediction:", predicted
+# print "-------------Error:", error
 
 if x_dim <= 2:
     import matplotlib.pyplot

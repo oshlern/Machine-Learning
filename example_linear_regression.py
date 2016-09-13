@@ -37,6 +37,7 @@ y1_2 = 0.7 * x1_1d * x1_1d - 0.4 * x1_1d + 1.5 + noise
 
 # randomly pick 50 pairs of numbers
 x2 = numpy.random.uniform(low=MIN_X, high=MAX_X, size=(NUM_INPUTS, 2))
+print x2
 
 # x is an array of arrays (necessary for the model fit function). The [:,n] slicing pulls out each of
 # the values for the nth feature into a one-dimensional list for y
@@ -47,8 +48,8 @@ y2 = 0.5 * x2[:,0] - 0.2 * x2[:,1] - 2 + noise
 
 
 ### Select which dataset we are using
-x = x1
-y = y1_1
+x = x2
+y = y2
 
 
 ################################################################################
