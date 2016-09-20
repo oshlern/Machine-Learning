@@ -4,7 +4,7 @@ from sklearn import linear_model
 print "-------------Libraries imported"
 
 x_dim = 1
-mx_dim = 2
+mx_dim = 2 #dimension of y polynomial
 min_x = -10
 max_x = 10
 length = 5
