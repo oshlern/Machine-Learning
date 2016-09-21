@@ -31,7 +31,6 @@ fake_docs = [
     'Today I have to solder a bank of capacitors',
     'NASA has rovers on Mars',
     'That was a devastating loss',
-    'Hitler did nothing wrong',
     'Programmers are weak',
     'Why did you steal my cheese',
     'We won by 5 goals']
