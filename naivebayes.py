@@ -6,6 +6,9 @@ def openData(doc):
     text = open(doc, 'r')
     text = text.read()
     return text
+def saveData(doc, data):
+    text = open(doc, 'w')
+    text = text.write(data)
 def parse(doc, n):
     text = openData(doc)
     text = re.sub(r'^[a-z0-9\']', '', text.lower())
@@ -57,3 +60,14 @@ print classifyWords('It was close upon four')
 # print "d", classify('d')
 # print "a", classify('a')
 print dataClassProbs
+
+
+words = sum(classes)
+def evaluate(test, model):
+    truePos, falsePos = 0, 0
+    for c in range(len(test)):
+        for data in test[c]:
+            if model(data) == c:
+                truePos += 1
+            else:
+                falsePos +=1
