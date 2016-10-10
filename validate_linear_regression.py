@@ -8,7 +8,7 @@ from sklearn import linear_model
 
 MIN_X = -10
 MAX_X = 10
-NUM_INPUTS = 2000
+NUM_INPUTS = 20
 NUM_TESTS = 10
 noise = np.random.normal(size=NUM_INPUTS) #change for test?
 x = np.random.uniform(low=MIN_X, high=MAX_X, size=(NUM_INPUTS+NUM_TESTS, 1))
@@ -27,11 +27,13 @@ def f(x):
 # y, y_test = f(x_1d), f(test_1d)
 
 # y = 0.3x + 1
-# y, y_test = 0.3 * x_1d + 1 + 0.2*noise, 0.3 * test_1d + 1 + 0.2*noise
+y = 0.3 * x_1d + 1 + noise
+y_test = 0.3 * test_1d + 1
 
 # y = 0.7x^2 - 0.4x + 1.5
 # y, y_test = 0.7 * x_1d * x_1d - 0.4 * x_1d + 1.5 + noise, 0.7 * test_1d * test_1d - 0.4 * test_1d + 1.5 + noise
-y = 0.7 * x_1d * x_1d - 0.4 * x_1d + 1.5 + noise
+# y = 0.7 * x_1d * x_1d - 0.4 * x_1d + 1.5 + noise
+# y_test = 0.7 * test_1d * test_1d - 0.4 * test_1d + 1.5
 
 ### 2 features
 
@@ -47,8 +49,8 @@ y2 = 0.5 * x2[:,0] * x2[:,0] - x2[:,0] - 0.2 * x2[:,1] * x2[:,1] - 2 + noise
 
 
 ### Select which dataset we are using
-x = x2
-y = y2
+# x = x1
+# y = y1
 
 
 ################################################################################
@@ -73,8 +75,8 @@ def rSq(y, predicted):
     varSq = np.square(np.subtract(y, average_y))
     return 1 - np.average(errSq)/np.average(varSq)
 
-# print "________RMSE_______", rmse(y_test, model.predict(test))
-# print "________R^2_______", rSq(y_test, model.predict(test))
+print "________RMSE_______", rmse(y_test, model.predict(test))
+print "________R^2_______", rSq(y_test, model.predict(test))
 
 print 'Intercept: {0}  Coefficients: {1}'.format(model.intercept_, model.coef_)
 
