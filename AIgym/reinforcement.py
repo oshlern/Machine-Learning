@@ -7,7 +7,6 @@ class alg:
         # TODO: Tie algorithm to environment? Probably
         self.bias = weights[0]
         self.weights = weights[1:]
-        # self.allWeights = weights
         self.numWeights = len(weights)
 
     def action(self, observation):
@@ -21,40 +20,29 @@ class alg:
 
     def run(self, env, limit, render=False, evaluate=False):
         # TODO: observe general run, not just end?
-        observation, reward = env.reset(), 0
+        observation, reward, performance = env.reset(), 0, 0
         for t in range(limit):
             action = self.action(observation)
             if render:
                 env.render()
                 # print action
             observation, reward, done, info = env.step(action)
+            if evaluate:
+                performance += observation
             if info != {}:
                 print "info", info
             if done:
-                return observation, reward, t
-        return observation, reward, limit
+                return observation, reward, done, t, performance
+        return observation, reward, done, limit, performance
 
-    def adjust(self, observation, reward, t):
-        v = -(reward-1.1)/t # = self.value(observation, reward, t)
-        self.weights = [w + o/reward for w,o in zip(self.weights, observation)]
-        self.bias += 1/(observation[0] + observation[1] + 0.1)
-
-    def train(self, env, episodes, limit, render=False):
-        for i_episode in range(episodes):
-            observation, reward, t = self.run(env, limit, render=render)
-            self.adjust(observation, reward, t)
-            if render:
-                print self.bias, self.weights
-                print("Episode {} finished after {} timesteps".format(i_episode, t))
-
-    def value(self, observation, reward, t):
-        out = abs(observation[0]) + abs(observation[1])
+    def value(self, observation, reward, done, t, evaluation=0):
+        out = evaluation + sum([abs(o) for o in observation]
         if int(reward):
             out += 1000
         return out/t
 
     def randAdjust(self, env, limit, render=False):
-        observation, reward, t = self.run(env, limit, render=render)
+        observation, reward, done, t, performance = self.run(env, limit, render=render)
         performance = self.value(observation, reward, t)
 
         temp = alg([self.bias + 0.01] + self.weights)
@@ -110,3 +98,19 @@ n = 10
 #     print "\n\n\n\nITERATION " + str(i) + " COMPLETE"
 # print sum(tests)/n
 time.sleep(1)
+
+
+
+
+# def adjust(self, observation, reward, t):
+#     v = -(reward-1.1)/t # = self.value(observation, reward, t)
+#     self.weights = [w + o/reward for w,o in zip(self.weights, observation)]
+#     self.bias += 1/(observation[0] + observation[1] + 0.1)
+#
+# def train(self, env, episodes, limit, render=False):
+#     for i_episode in range(episodes):
+#         observation, reward, t = self.run(env, limit, render=render)
+#         self.adjust(observation, reward, t)
+#         if render:
+#             print self.bias, self.weights
+#             print("Episode {} finished after {} timesteps".format(i_episode, t))

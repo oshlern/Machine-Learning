@@ -12,30 +12,36 @@ class alg:
         self.numWeights = len(weights) - 1
 
     def action(self, observation):
-        value = numpy.dot(self.weights, observation) + self.bias
-        out = 0
+        value = numpy.dot(self.weights, observation) #+ self.bias
+        value = observation[1]
+        out = 1
         if value > 0:
             out = 2
         elif value < 0:
-            out = 1
+            out = 0
+        # print value
+        # time.sleep(0.5)
         return out
 
-    def run(self, env, limit, render=False, evaluate=False):
-        observation, reward = env.reset(), 0
+    def run(self, env, limit, render=False):
+        observation, done = env.reset(), 0
         furthest = observation[0]
         for t in range(limit):
             action = self.action(observation)
             if render:
                 env.render()
-                # print action
+                print t, action
             observation, reward, done, info = env.step(action)
             if observation[0] > furthest:
                 furthest = observation[0]
             if info != {}:
                 print "info", info
             if done:
-                return observation, reward, t
-        return furthest, reward
+                if render:
+                    print "COMPLETED!"
+                    # time.sleep(1)
+                break
+        return furthest, done
 
     def adjust(self, observation, reward, t):
         v = -(reward-1.1)/t # = self.value(observation, reward, t)
@@ -52,7 +58,7 @@ class alg:
 
     def value(self, observation, reward, t):
         out = abs(observation[0]) + abs(observation[1])
-        if int(reward):
+        if reward:
             out += 1000
         return out/t
 
@@ -62,36 +68,41 @@ class alg:
         temp = alg([self.bias + self.dw] + self.weights)
         tempFurthest, tempReward = temp.run(env, limit, render=render)
         change = self.dw * (tempFurthest-furthest)
-        print "ADJUSTING", change
+        if render:
+            print "ADJUSTING", change
+            # time.sleep(1)
         self.bias += change
         for i in range(self.numWeights):
             newWeights = copy.deepcopy(self.weights)
             newWeights[i] += self.dw
             temp = alg([self.bias] + newWeights)
-            tempFurthest, tempReward = temp.run(env, limit, render=render)
-            change = self.dw * (tempFurthest-performance)
-            print i, change
-            self.weights[i] -= change
+            tempFurthest, tempReward = temp.run(env, limit, render=False)
+            change = self.dw * (tempFurthest-furthest)
+            print "hi"
+            if render:
+                print i, change
+                # time.sleep(1)
+            self.weights[i] += change
 
     def randTrain(self, env, episodes, limit, render=False):
         for i_episode in range(episodes):
             self.printWeights()
+            if render and i_episode%20 == 0:
+                time.sleep(0.5)
             self.randAdjust(env, limit, render=render)
             # self.adjust(self.run(env, limit, render=render))
             print("Episode {} finished".format(i_episode))
 
     def test(self, env, episodes, limit, render=False):
-        times = []
+        count = 0
         self.printWeights()
         for i_episode in range(episodes):
             furthest, reward = self.run(env, limit, render=render)
-            print observation
-            if t != limit:
-                times.append(t)
-            print("Episode {} finished after {} timesteps".format(i_episode, t))
-        print "Completed {} out of {}, or {}%".format(len(times), episodes, len(times)/episodes*100)
-        print "average time: {}".format(sum(times)/(len(times)+0.0001))
-        return len(times)/episodes*100
+            if reward:
+                count += 1
+            print("Episode {} finished and {}".format(i_episode, reward))
+        print "Completed {} out of {}, or {}%".format(count, episodes, count/episodes*100)
+        return count/episodes*100
 
     def printWeights(self):
         print "Weights: ", [self.bias] + self.weights
@@ -99,14 +110,17 @@ class alg:
 env = gym.make('MountainCar-v0')
 mc = alg()
 # mc.printWeights()
-mc.randTrain(env, 100, 500)
+# mc.randTrain(env, 500, 250, render=False)
+# mc.randTrain(env, 50, 150, render=False)
 # mc.printWeights()
+# time.sleep(5)
 # mc.run(env, 500, render=True)
 # time.sleep(10)
-mc.test(env, 25, 120, render=True)
+# mc.test(env, 5, 120, render=True)
 
 tests = []
 n = 10
+mc.test(env, 2000, 400, render=False)
 # for i in range(n):
 #     tests.append(mc.test(env, 1000, 1000, render=False))
 #     print "\n\n\n\nITERATION " + str(i) + " COMPLETE"
