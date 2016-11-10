@@ -2,31 +2,29 @@ from __future__ import division
 import numpy as np
 import math
 
-class Network:
+class Network(object):
     learningRate = 0.1
-    def __init__(self, input_dim, output_dim, hidden_dim, numHidden=1):
-        self.inDim, self.hidDim, self.outDim, self.numHidden = input_dim, hidden_dim, output_dim, numHidden
+    def __init__(self, input_dim, numHidden=1):
+        self.width, self.height = input_dim, numHidden + 1
         self.W = self.initializeWeights()
 
     def initializeWeights(self):
         #TODO DONT INITIALIZE TO ZEROS (for gradient descent not being uniform), instead, small random value
-        weights = np.array(np.random.rand(self.hidDim, self.inDim)) #does work?
-        print weights
-        for i in range(self.numHidden-1):
-            weights = np.concatenate((weights, np.random.rand(self.hidDim, self.hidDim)))
-        weights = np.concatenate((weights, np.random.rand(self.outDim, self.hidDim)))
-        #weights has numHidden many hidden layers + 1 output layer
+        weights = np.random.rand(self.width, self.height, self.height + 1)
         print "\nWEIGHTS\n{}\n\n".format(weights)
         return weights
 
     def efficientCompute(self, x):
-        X = np.array(x)
+        X = np.array([x])
         for layer in self.W:
             print "LAYER: ", layer
             y = np.array([np.dot(x, w[1:]) + w[0] for w in layer])
-            print y
             y = np.reciprocal(np.add(np.exp(np.negative(y)), 1))
-            np.concatenate(X, y)
+            # print np.shape([[yi] for yi in y])
+            # print np.shape(X)
+            print y
+            # print "X", X
+            X = np.concatenate((X, np.transpose([[yi] for yi in y])))
             x = y
         return x, X # output, activationsMatrix
 
@@ -34,22 +32,22 @@ class Network:
         predicted, activations = self.efficientCompute(x) #Save the output of sigmoid? (and use it for dsigmoid)
         #array, numhidden + input + output
         # dCost, delta = self.initializeWeights()
-        delta = dw = copy.deepcopy(self.W)
+        delta = dw = np.empty_like(self.W)
         dCost = np.subtract(predicted, y)
-        dActivation = np.dot(activations[self.numHidden+1], np.subtract(1, activations[self.numHidden+1]))
-        delta[self.numHidden] = np.multiply(dCost[self.numHidden], dActivation) #TODO: make it stay as array (np function)
-        dw[self.numHidden] = np.concatenate(np.multiply(activations[self.numHidden], delta[self.numHidden]), delta[self.numHidden]) # Bias is in front
-        # db = delta[self.numHidden]
-        for layer in reversed(range(self.numHidden)):
+        dActivation = np.dot(activations[self.width+1], np.subtract(1, activations[self.width+1]))
+        delta[self.width] = np.multiply(dCost[self.width], dActivation) #TODO: make it stay as array (np function)
+        dw[self.width] = np.concatenate(np.multiply(activations[self.width], delta[self.width]), delta[self.width]) # Bias is in front
+        # db = delta[self.width]
+        for layer in reversed(range(self.width)):
             dActivation = np.dot(activations[layer], np.subtract(1, activations[layer]))
             delta[layer] = np.multiply(np.dot(np.transpose(self.W[layer+1]), delta[layer+1]), dActivation)
         self.W[:,:,:,0] = np.subtract(self.W[:,:,:,0], delta)
         self.W[:,:,:,1:] = np.subtract(self.W[:,:,:,1:], np.multiply(activations[1:], delta))
             # self.W[layer] = np.subtract(self.W[layer], delta + dw) #TODO: FIX concatenateing
 
-net = Network(3, 1, 2)
-data = np.random.rand(5, net.inDim)
-print data
+net = Network(3)
+data = np.random.rand(5, net.height)
+print data[0]
 print "SHSUID", net.efficientCompute(data[0])
 
     # def cost(predicted, y):
