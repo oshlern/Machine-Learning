@@ -3,8 +3,8 @@ import numpy as np
 import math
 
 class Network(object):
-    learningRate = 0.1
-    def __init__(self, input_dim, numHidden=1):
+    learningRate = 3 #change
+    def __init__(self, input_dim, numHidden=2):
         self.numLayers, self.height = numHidden + 1, input_dim
         self.W = self.initializeWeights()
 
@@ -13,51 +13,62 @@ class Network(object):
         print "\nWEIGHTS\n{}\n\n".format(weights)
         return weights
 
-    def efficientCompute(self, x):
+    def efficientCompute(self, x, allActivations=False):
         X = np.array([x])
         for layer in self.W:
-            print "LAYER: ", layer
+            # print "LAYER: ", layer
             y = np.array([np.dot(x, w[1:]) + w[0] for w in layer])
             y = np.reciprocal(np.add(np.exp(np.negative(y)), 1))
             # print np.shape([[yi] for yi in y])
             # print np.shape(X)
-            print y
+            # print y
             # print "X", X
             X = np.concatenate((X, np.transpose([[yi] for yi in y])))
             x = y
-        return x, X # output, activationsMatrix
+        if allActivations:
+            return X
+        return x
 
     def efficientBackprop(self, x, y):
-        predicted, activations = self.efficientCompute(x) #Save the output of sigmoid? (and use it for dsigmoid)
-        #array, numhidden + input + output
-        # dCost, delta = self.initializeWeights()
-        delta = dw = np.empty((self.numLayers, self.height + 1))
-        dCost = np.subtract(predicted, y)
-        dActivation = np.multiply(activations, np.subtract(1, activations))
-        print activations
-        print dCost.shape, "____dCost Shape \n"
-        print dActivation[self.numLayers].shape, "____dActivation Shape \n"
-        delta[self.numLayers-1] = np.multiply(dCost, dActivation[self.numLayers]) #TODO: make it stay as array (np function)
-        dw[self.numLayers] = np.concatenate(np.multiply(activations[self.numLayers], delta[self.numLayers]), delta[self.numLayers]) # Bias is in front
-        # db = delta[self.height]
-        for layer in reversed(range(self.numLayers)):
-            dActivation = np.dot(activations[layer], np.subtract(1, activations[layer]))
-            delta[layer] = np.multiply(np.dot(np.transpose(self.W[layer+1]), delta[layer+1]), dActivation)
-        self.W[:,:,:,0] = np.subtract(self.W[:,:,:,0], delta)
-        self.W[:,:,:,1:] = np.subtract(self.W[:,:,:,1:], np.multiply(activations[1:], delta))
-            # self.W[layer] = np.subtract(self.W[layer], delta + dw) #TODO: FIX concatenateing
+        activations = self.efficientCompute(x, allActivations=True)
+        delta = np.empty((self.numLayers, self.height))
+        dCost = np.subtract(activations[self.numLayers], y)
+        dActivations = np.multiply(activations, np.subtract(1, activations))
+        delta[self.numLayers-1] = np.multiply(dCost, dActivations[self.numLayers])
+        for layer in reversed(range(self.numLayers-1)):
+            delta[layer] = np.multiply(np.dot(np.transpose(self.W[layer+1,:,1:]), delta[layer+1]), dActivations[layer+1])
+        self.W[:,:,0] = np.subtract(self.W[:,:,0], delta)
+        self.W[:,:,1:] = np.subtract(self.W[:,:,1:], self.learningRate * np.multiply(activations[1:], delta))
+
     def backpropMultiple(self, X, Y):
         indeces = np.arange(len(X))
         np.random.shuffle(indeces)
         for i in indeces:
             self.efficientBackprop(X[i], Y[i])
 
+    def test(self, x, y):
+        return np.linalg.norm(np.subtract(y, self.efficientCompute(x)))
+
+    def testMultiple(self, X, Y):
+        error = 0
+        for x,y in zip(X,Y):
+            error += self.test(x, y)
+        return error/len(X)
+
 
 net = Network(3)
 data = np.random.rand(5, net.height)
-print len(data)
-print "____COMPUTING:\n", net.efficientCompute(data[0])
-net.backpropMultiple(data, data*2)
+print data[0], data[0]*2
+print "____COMPUTING:\n",
+original = net.testMultiple(data, data*2)
+for i in range(10000):
+    if i%1000 == 0:
+        print i
+    net.backpropMultiple(data, data*2)
+final = net.testMultiple(data, data*2)
+improvement = original - final
+print improvement
+
 
     # def cost(predicted, y):
     #     return 0.5(y-predicted)**2
