@@ -5,12 +5,11 @@ import math
 class Network(object):
     learningRate = 0.1
     def __init__(self, input_dim, numHidden=1):
-        self.width, self.height = input_dim, numHidden + 1
+        self.numLayers, self.height = numHidden + 1, input_dim
         self.W = self.initializeWeights()
 
     def initializeWeights(self):
-        #TODO DONT INITIALIZE TO ZEROS (for gradient descent not being uniform), instead, small random value
-        weights = np.random.rand(self.width, self.height, self.height + 1)
+        weights = np.random.rand(self.numLayers, self.height, self.height + 1)
         print "\nWEIGHTS\n{}\n\n".format(weights)
         return weights
 
@@ -32,23 +31,33 @@ class Network(object):
         predicted, activations = self.efficientCompute(x) #Save the output of sigmoid? (and use it for dsigmoid)
         #array, numhidden + input + output
         # dCost, delta = self.initializeWeights()
-        delta = dw = np.empty_like(self.W)
+        delta = dw = np.empty((self.numLayers, self.height + 1))
         dCost = np.subtract(predicted, y)
-        dActivation = np.dot(activations[self.width+1], np.subtract(1, activations[self.width+1]))
-        delta[self.width] = np.multiply(dCost[self.width], dActivation) #TODO: make it stay as array (np function)
-        dw[self.width] = np.concatenate(np.multiply(activations[self.width], delta[self.width]), delta[self.width]) # Bias is in front
-        # db = delta[self.width]
-        for layer in reversed(range(self.width)):
+        dActivation = np.multiply(activations, np.subtract(1, activations))
+        print activations
+        print dCost.shape, "____dCost Shape \n"
+        print dActivation[self.numLayers].shape, "____dActivation Shape \n"
+        delta[self.numLayers-1] = np.multiply(dCost, dActivation[self.numLayers]) #TODO: make it stay as array (np function)
+        dw[self.numLayers] = np.concatenate(np.multiply(activations[self.numLayers], delta[self.numLayers]), delta[self.numLayers]) # Bias is in front
+        # db = delta[self.height]
+        for layer in reversed(range(self.numLayers)):
             dActivation = np.dot(activations[layer], np.subtract(1, activations[layer]))
             delta[layer] = np.multiply(np.dot(np.transpose(self.W[layer+1]), delta[layer+1]), dActivation)
         self.W[:,:,:,0] = np.subtract(self.W[:,:,:,0], delta)
         self.W[:,:,:,1:] = np.subtract(self.W[:,:,:,1:], np.multiply(activations[1:], delta))
             # self.W[layer] = np.subtract(self.W[layer], delta + dw) #TODO: FIX concatenateing
+    def backpropMultiple(self, X, Y):
+        indeces = np.arange(len(X))
+        np.random.shuffle(indeces)
+        for i in indeces:
+            self.efficientBackprop(X[i], Y[i])
+
 
 net = Network(3)
 data = np.random.rand(5, net.height)
-print data[0]
-print "SHSUID", net.efficientCompute(data[0])
+print len(data)
+print "____COMPUTING:\n", net.efficientCompute(data[0])
+net.backpropMultiple(data, data*2)
 
     # def cost(predicted, y):
     #     return 0.5(y-predicted)**2

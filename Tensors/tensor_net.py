@@ -1,16 +1,22 @@
 import tensorflow as tf
 import numpy as np
 
-numLayers = tf.placeholder(tf.int32)
-x_data = np.random.rand(100,3).astype(np.float32)
+numLayers = 5
+inDim = 3
+class Network:
+    def __init__(self, numLayers, inDim):
+        self.W = tf.Variable(tf.random_uniform([numLayers, inDim, inDim], -0.1, 0.1))
+        self.b = tf.Variable(tf.zeros([numLayers, inDim]))
+
+    def feedforward(x):
+
+
+x_data = np.random.rand(100, inDim).astype(np.float32)
 y_data = x_data * x_data * x_data - 0.3 * x_data * x_data + 2 * x_data - 1
 
 # Try to find values for W and b that compute y_data = W * x_data + b
 # (We know that W should be 0.1 and b 0.3, but TensorFlow will
 # figure that out for us.)
-
-W = tf.Variable(tf.random_uniform([numLayers,,2], -1.0, 1.0))
-b = tf.Variable(tf.zeros([5,2,2,2,2]))
 y = W * x_data + b
 
 # Minimize the mean squared errors.
