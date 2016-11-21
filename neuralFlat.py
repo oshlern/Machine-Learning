@@ -73,26 +73,33 @@ class Network(object):
 
 
 dim = 3
-data = np.random.rand(500, dim)
+data = np.random.rand(50000, dim)
 func = np.random.rand(dim)
 print func
 out = np.reciprocal(np.add(np.exp(np.negative(np.dot(data, func))), 1))
 print out.shape
 
-test = np.random.rand(30, dim)
+test = np.random.rand(300, dim)
 testOut = np.reciprocal(np.add(np.exp(np.negative(np.dot(test, func))), 1))
-
-beforeTests = []
-afterTests = []
-print "____COMPUTING:\n",
-for rate in [0.01, 0.03, 0.1, 0.3, 1, 3, 10, 30, 100]:
-    net = Network(dim, learningRate=rate)
-    print rate
-    # print net.W, net.outLayer
-    beforeTests.append(net.testMultiple(test, testOut))
-    net.trainBatches(data, out, 20, 500)
-    # print "new"
-    # print net.W, net.outLayer
-    afterTests.append(net.testMultiple(test, testOut))
-improvement = np.subtract(beforeTests, afterTests)
-print improvement
+improvements = np.array([])
+for i in range(5):
+    beforeTests = []
+    afterTests = []
+    # print "____COMPUTING:\n", i
+    for rate in [0.01, 0.03, 0.1, 0.3, 1, 3, 10, 30, 100]:
+        net = Network(dim, learningRate=rate)
+        # print rate
+        # print net.W, net.outLayer
+        beforeTests.append(net.testMultiple(test, testOut))
+        net.trainBatches(data, out, 20, 1)
+        # print "new"
+        # print net.W, net.outLayer
+        afterTests.append(net.testMultiple(test, testOut))
+    improvement = np.subtract(beforeTests, afterTests)
+    if i == 0:
+        improvements = improvement
+    else:
+        np.add(improvements,improvement)
+avg = np.divide(improvements, 5)
+print avg
+print "i have learned"
