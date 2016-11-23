@@ -9,19 +9,13 @@ class Network(object):
 
     def initializeWeights(self):
         weights = np.random.rand(self.numLayers, self.height, self.height + 1)
-        print "\nWEIGHTS\n{}\n\n".format(weights)
         return weights
 
-    def efficientCompute(self, x, allActivations=False):
+    def compute(self, x, allActivations=False):
         X = np.array([x])
         for layer in self.W:
-            # print "LAYER: ", layer
             y = np.array([np.dot(x, w[1:]) + w[0] for w in layer])
             y = np.reciprocal(np.add(np.exp(np.negative(y)), 1))
-            # print np.shape([[yi] for yi in y])
-            # print np.shape(X)
-            # print y
-            # print "X", X
             if allActivations:
                 X = np.concatenate((X, np.transpose([[yi] for yi in y])))
             x = y
@@ -29,7 +23,7 @@ class Network(object):
             return X
         return x
 
-    def efficientBackprop(self, x, y):
+    def backprop(self, x, y):
         activations = self.efficientCompute(x, allActivations=True)
         delta = np.empty((self.numLayers, self.height))
         dCost = np.subtract(activations[self.numLayers], y)
