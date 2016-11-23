@@ -1,6 +1,7 @@
 from __future__ import division
 import numpy as np
 import math
+# Rectangular fully connected network with an additional output neuron to reduce dimension of output
 
 class Network(object):
     def __init__(self, input_dim, numHidden=3, learningRate=3):
@@ -10,7 +11,6 @@ class Network(object):
 
     def initializeWeights(self):
         weights = np.random.rand(self.numLayers, self.height, self.height + 1)
-        # print "\nWEIGHTS\n{}\n\n".format(weights)
         return weights
 
     def compute(self, x, allActivations=False):
@@ -85,21 +85,16 @@ improvements = np.array([])
 for i in range(5):
     beforeTests = []
     afterTests = []
-    # print "____COMPUTING:\n", i
     for rate in [0.01, 0.03, 0.1, 0.3, 1, 3, 10, 30, 100]:
         net = Network(dim, learningRate=rate)
-        # print rate
-        # print net.W, net.outLayer
         beforeTests.append(net.testMultiple(test, testOut))
         net.trainBatches(data, out, 20, 1)
-        # print "new"
-        # print net.W, net.outLayer
         afterTests.append(net.testMultiple(test, testOut))
     improvement = np.subtract(beforeTests, afterTests)
     if i == 0:
         improvements = improvement
     else:
         np.add(improvements,improvement)
-avg = np.divide(improvements, 5)
-print avg
+avgImprovement = np.divide(improvements, 5)
+print avgImprovement
 print "i have learned"

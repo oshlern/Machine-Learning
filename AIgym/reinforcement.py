@@ -1,7 +1,12 @@
 from __future__ import division
 # From Open AI Gym (https://gym.openai.com)
 import gym, time, numpy, copy, random
-
+# This is my attempt at creating a structure for a reinforcement algorithm that could be implemented in different tasks.
+# It is currently fit to MountainCar. It is currently just a perceptron.
+# The algorithm uses the OpenAI env to render, act, and observe.
+# It evaluates its current state (value), and then tweaks its constants minutely and reevaluates to calculate the derivative of error
+# Using the derivative, it updates the weights (and repeats: randTrain).
+# It can also evaluate itself with test.
 class alg:
     def __init__(self, weights=[0, 0, 0]):
         # TODO: Tie algorithm to environment? Probably
@@ -42,6 +47,7 @@ class alg:
         return out/t
 
     def randAdjust(self, env, limit, render=False):
+        # Tries to approximate derivatives and adjust porportionally
         observation, reward, done, t, performance = self.run(env, limit, render=render)
         performance = self.value(observation, reward, t)
 

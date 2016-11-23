@@ -2,7 +2,9 @@ from __future__ import division
 # From Open AI Gym (https://gym.openai.com)
 import gym, time, numpy, copy, random
 # TODO: test a bunch for performance, not just once (environment changes)
-# TODO: Automatically normalize observations
+# This version automatically normalizes observations to fit a range of -1 to 1 based on the minimum and maximum observations of the last run
+# In Progress, doesn't yet work
+
 class alg:
     dw = 0.01
     learningRate = 10

@@ -1,6 +1,6 @@
 import tensorflow as tf
 import numpy as np
-
+# Beginning to implement a neural net in tf, not yet functional
 numLayers = 5
 inDim = 3
 class Network:

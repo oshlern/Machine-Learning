@@ -1,6 +1,7 @@
 from __future__ import division
 import numpy as np
 import math
+# Rectangular fully connected netwrok
 
 class Network(object):
     def __init__(self, input_dim, numHidden=2, learningRate=3):
