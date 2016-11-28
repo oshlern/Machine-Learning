@@ -1,6 +1,6 @@
 import tensorflow as tf
 import numpy as np
-
+# Code from the MNIST tutorial at tensorflow (https://www.tensorflow.org/versions/r0.10/tutorials/mnist/pros/index.html#deep-mnist-for-experts)
 from tensorflow.examples.tutorials.mnist import input_data
 mnist = input_data.read_data_sets('MNIST_data', one_hot=True)
 
