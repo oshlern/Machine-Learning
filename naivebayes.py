@@ -25,7 +25,7 @@ classes = parse('big.txt', 6)
     # classes += [parse(doc)]
 # classes = [['a', 'b'], ['a','c','b'], ['d','c','a','e'], ['e','e','e'], ['f','f']]
 numClasses = len(classes)
-classProbs = [1/numClasses]*numClasses
+classProbs = [1/numClasses]*numClasses # An array of the probability that a random element is in a given class (currently evenly distributed)
 dataClassProbs = {}
 classTotals = [len(i) for i in classes]
 total = sum(classTotals)
@@ -41,7 +41,7 @@ def dataClassProb(x):
             dataClassProbs[x] += [count/classTotals[i]]
     return dataClassProbs[x]
 
-def classify(x):
+def getProb(x):
     xcProb = dataClassProb(x)
     xProb = sum(dataClassProb(x))
     # print xProb
@@ -53,12 +53,12 @@ def classifyWords(words):
     words = words.split(' ')
     out = [0]*numClasses
     for word in words:
-        out = [o + w/len(words) for o,w in zip(out, classify(word))]
+        out = [o + w/len(words) for o,w in zip(out, getProb(word))]
     return out
 print classifyWords('It was close upon four')
-# print "e", classify('e')
-# print "d", classify('d')
-# print "a", classify('a')
+# print "e", getProb('e')
+# print "d", getProb('d')
+# print "a", getProb('a')
 print dataClassProbs
 
 

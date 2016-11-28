@@ -24,23 +24,30 @@ def generateClusters(numClusters=3):
 def categorize(data, clusters):
     categorized = []
     for x in data:
-        closest, closestCluster = [(clusters[0][i]-x[i])**2 for i in range(dim)], 0
+        closest, closestCluster = sum([(clusters[0][j]-x[j])**2 for j in range(dim)]), 0
         for i in range(len(clusters)):
-            dist = [(clusters[i][j]-x[j])**2 for j in range(dim)]
+            dist = sum([(clusters[i][j]-x[j])**2 for j in range(dim)])
+            # print i, dist
             if dist < closest:
                 closest, closestCluster = dist, i
         categorized.append(closestCluster)
+    print "CATEGORIZED", categorized
     return categorized
 
 def generateClustersX(x, batchSize, numClusters=3):
     tempX = copy.deepcopy(x)
-    tempClusters = [[0]*dim]*numClusters
+    tempClusters = []
+    tempCluster = []
+    for i in xrange(dim):
+        tempCluster.append(0)
+    for i in xrange(numClusters):
+        tempClusters.append(tempCluster)
     print x
     print len(tempX)
     for n in range(numClusters):
         for i in range(batchSize):
             dataPoint = tempX.pop(random.randrange(0,len(tempX)))
-            print dataPoint
+            # print dataPoint
             tempClusters[n] = [tempClusters[n][j] + dataPoint[j] for j in range(dim)]
         for i in range(numClusters):
             tempClusters[i] = [clusterX/batchSize for clusterX in tempClusters[i]]
@@ -48,7 +55,7 @@ def generateClustersX(x, batchSize, numClusters=3):
     for i in range(numClusters):
         if i not in categorized:
             print i
-    print categorized
+    # print categorized
             # return generateClustersX(x,batchSize,numClusters)
     return tempClusters
 
@@ -79,8 +86,14 @@ for cluster in trueX:
 #     return right/(right+wrong)
 
 def iterate(x, categorized, numClusters=3, randomness=0):
-    tempClusters = [[0]*dim]*numClusters
-    count = [0]*numClusters
+    tempClusters = []
+    tempCluster = []
+    count = []
+    for i in xrange(dim):
+        tempCluster.append(0)
+    for i in xrange(numClusters):
+        tempClusters.append(tempCluster)
+        count.append(0)
     for i in range(len(categorized)):
         tempClusters[categorized[i]] = [tempClusters[categorized[i]][j] + x[i][j] + randomness for j in range(dim)]
         count[categorized[i]] += 1

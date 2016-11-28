@@ -70,9 +70,8 @@ def rmse(y, predicted):
 
 def rSq(y, predicted):
     yAvg = np.average(y)
-    average_y = np.array([yAvg]*len(y))
     errSq = np.square(np.subtract(y, predicted))
-    varSq = np.square(np.subtract(y, average_y))
+    varSq = np.square(np.subtract(y, yAvg))
     return 1 - np.average(errSq)/np.average(varSq)
 
 print "________RMSE_______", rmse(y_test, model.predict(test))
